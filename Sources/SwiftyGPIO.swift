@@ -52,44 +52,44 @@ public class GPIO {
 
     public var direction: GPIODirection {
         set(dir) {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             performSetting("gpio" + String(id) + "/direction", value: dir.rawValue)
         }
         get {
-            if !exported { enableIO(id)}
+            if !exported { enableIO()}
             return GPIODirection(rawValue: getStringValue("gpio"+String(id)+"/direction")!)!
         }
     }
 
     public var edge: GPIOEdge {
         set(dir) {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             performSetting("gpio"+String(id)+"/edge", value: dir.rawValue)
         }
         get {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             return GPIOEdge(rawValue: getStringValue("gpio"+String(id)+"/edge")!)!
         }
     }
 
     public var activeLow: Bool {
         set(act) {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             performSetting("gpio"+String(id)+"/active_low", value: act ? "1":"0")
         }
         get {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             return getIntValue("gpio"+String(id)+"/active_low")==0
         }
     }
 
     public var value: Int {
         set(val) {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             performSetting("gpio"+String(id)+"/value", value: val)
         }
         get {
-            if !exported {enableIO(id)}
+            if !exported {enableIO()}
             return getIntValue("gpio"+String(id)+"/value")!
         }
     }
@@ -128,14 +128,21 @@ public class GPIO {
     public func clearListeners() {
         (intFuncFalling, intFuncRaising, intFuncChange) = (nil, nil, nil)
         listening = false
+        disableIO()
     }
-
+    public func close() {
+        disableIO()
+    }
 }
 
 fileprivate extension GPIO {
 
-    func enableIO(_ id: Int) {
+    func enableIO() {
         writeToFile(GPIOBASEPATH+"export", value:String(id))
+        exported = true
+    }
+    func disableIO() {
+        writeToFile(GPIOBASEPATH+"unexport", value:String(id))
         exported = true
     }
 
