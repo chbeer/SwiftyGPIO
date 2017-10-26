@@ -130,7 +130,8 @@ public class GPIO {
         listening = false
         disableIO()
     }
-    public func close() {
+    public func cleanUp() {
+        clearListeners()
         disableIO()
     }
 }
